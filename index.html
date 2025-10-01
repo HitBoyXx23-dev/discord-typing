@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Typing Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Discord Typing Simulator</h1>
+    <form id="sendForm">
+      <label for="channelId">Channel ID:</label>
+      <input type="text" id="channelId" placeholder="Enter Channel ID">
+
+      <label for="token">Bot Token:</label>
+      <input type="text" id="token" placeholder="Enter Bot Token">
+
+      <button type="submit">Start Typing</button>
+    </form>
+
+    <div id="response" class="response"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
