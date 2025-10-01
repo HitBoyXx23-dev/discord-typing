@@ -1,10 +1,12 @@
 const form = document.getElementById("sendForm");
 const channelInput = document.getElementById("channelId");
 const tokenInput = document.getElementById("token");
+const durationInput = document.getElementById("duration");
 const responseDiv = document.getElementById("response");
+const stopButton = document.getElementById("stopButton");
 
-let typingInterval; // interval ID
-let typingTimeout;  // timeout ID
+let typingInterval;
+let typingTimeout;
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -12,15 +14,23 @@ form.addEventListener("submit", (e) => {
 
   const channelId = channelInput.value.trim();
   const token = tokenInput.value.trim();
+  const duration = parseInt(durationInput.value.trim(), 10);
 
-  if (!channelId || !token) {
-    responseDiv.textContent = "Please fill in all fields.";
+  if (!channelId || !token || isNaN(duration) || duration < 1) {
+    responseDiv.textContent = "Please fill in all fields and set a valid duration.";
     return;
   }
 
+  startTyping(channelId, token, duration);
+});
+
+stopButton.addEventListener("click", () => {
+  stopTyping();
+});
+
+function startTyping(channelId, token, duration) {
   // Stop any existing simulation
-  if (typingInterval) clearInterval(typingInterval);
-  if (typingTimeout) clearTimeout(typingTimeout);
+  stopTyping();
 
   // Trigger typing immediately
   triggerTyping(channelId, token);
@@ -30,15 +40,26 @@ form.addEventListener("submit", (e) => {
     triggerTyping(channelId, token);
   }, 7000);
 
-  // Automatically stop typing simulation after 30 seconds
+  // Automatically stop typing simulation after user-defined duration
   typingTimeout = setTimeout(() => {
+    stopTyping();
+    responseDiv.textContent += `\nTyping simulation stopped automatically after ${duration} seconds.`;
+  }, duration * 1000);
+
+  responseDiv.textContent = `Typing simulation started in channel ${channelId} for ${duration} seconds.`;
+}
+
+function stopTyping() {
+  if (typingInterval) {
     clearInterval(typingInterval);
     typingInterval = null;
-    responseDiv.textContent += "\nTyping simulation stopped automatically after 30 seconds.";
-  }, 30000); // 30 seconds
-
-  responseDiv.textContent = `Typing simulation started in channel ${channelId} for 30 seconds.`;
-});
+  }
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+    typingTimeout = null;
+  }
+  responseDiv.textContent += "\nTyping simulation stopped manually.";
+}
 
 async function triggerTyping(channelId, token) {
   try {
@@ -61,6 +82,5 @@ async function triggerTyping(channelId, token) {
 
 // Stop typing simulation when leaving page
 window.addEventListener("beforeunload", () => {
-  if (typingInterval) clearInterval(typingInterval);
-  if (typingTimeout) clearTimeout(typingTimeout);
+  stopTyping();
 });
